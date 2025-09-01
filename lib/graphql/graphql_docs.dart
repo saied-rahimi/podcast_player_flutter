@@ -1,3 +1,18 @@
+const String queryAllPodcasts = r"""
+query {
+getPodcasts{
+  id
+  title
+  episodsList{
+    id
+    title
+    isPlayed
+  }
+}
+}
+
+""";
+
 const String createPodcast = r"""
 mutation CreatePodcast($title: String!) {
   createPodcast(title: $title) {

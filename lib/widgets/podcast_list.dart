@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:podcast_player/graphql/graphql_docs.dart';
 import 'package:podcast_player/model/podcast_model.dart';
 import 'package:podcast_player/widgets/text_widget.dart';
 
@@ -8,26 +9,13 @@ import 'item_list_view.dart';
 
 class PodcastList extends StatelessWidget {
   const PodcastList({super.key});
-  static const String querySting = """
-query {
-getPodcasts{
-  id
-  title
-  episodsList{
-    id
-    title
-    isPlayed
-  }
-}
-}
 
-""";
   @override
   Widget build(BuildContext context) {
     final title = 'Podcast List';
     return Material(
       child: Query(
-        options: QueryOptions(document: gql(querySting)),
+        options: QueryOptions(document: gql(queryAllPodcasts)),
         builder: (QueryResult result, {VoidCallback? refetch, FetchMore? fetchMore}) {
           if (result.hasException) {
             return Center(child: Text(result.exception.toString()));
