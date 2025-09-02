@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:podcast_player/bloc/podcast_cubit.dart';
 import 'package:podcast_player/dialog/add_item_dialog.dart';
 import 'package:podcast_player/graphql/graphql_docs.dart';
 import 'package:podcast_player/model/podcast_model.dart';
@@ -20,6 +22,7 @@ class ItemListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.sizeOf(context);
     String createItem = podcastId == null ? createPodcast : createEpisode;
+    final client = GraphQLProvider.of(context).value;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -39,15 +42,16 @@ class ItemListView extends StatelessWidget {
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (context) => AddItemDialog(
+                        builder: (_) => AddItemDialog(
                           onCreate: (title) async {
-                            final client = GraphQLProvider.of(context).value;
                             if (podcastId != null) {
                               await client.mutate(MutationOptions(document: gql(createItem), variables: {'podcastId': podcastId, 'title': title}));
                             } else {
                               await client.mutate(MutationOptions(document: gql(createItem), variables: {'title': title}));
                             }
                             if (context.mounted) {
+                              context.read<PodcastsCubit>().refresh();
+
                               Navigator.of(context).maybePop();
                             }
                           },
@@ -79,14 +83,20 @@ class ItemListView extends StatelessWidget {
                         onTap: () {
                           showDialog(
                             context: context,
-                            builder: (context) => AddItemDialog(
-                              onCreate: (title) {
+                            builder: (_) => AddItemDialog(
+                              onCreate: (title) async {
                                 if (podcastId != null) {
-                                  runMutation({'podcastId': podcastId, 'title': title});
+                                  await client.mutate(
+                                    MutationOptions(document: gql(createItem), variables: {'podcastId': podcastId, 'title': title}),
+                                  );
                                 } else {
-                                  runMutation({'title': title});
+                                  await client.mutate(MutationOptions(document: gql(createItem), variables: {'title': title}));
                                 }
-                                Navigator.of(context).maybePop();
+                                if (context.mounted) {
+                                  context.read<PodcastsCubit>().refresh();
+
+                                  Navigator.of(context).maybePop();
+                                }
                               },
                             ),
                           );

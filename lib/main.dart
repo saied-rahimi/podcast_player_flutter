@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:podcast_player/bloc/podcast_cubit.dart';
 import 'package:podcast_player/widgets/podcast_list.dart';
 
 void main() {
@@ -11,7 +13,8 @@ void main() {
     ),
   );
   final graphqlApp = GraphQLProvider(client: client, child: MyApp());
-  runApp(graphqlApp);
+  final blocProvider = BlocProvider<PodcastsCubit>(create: (context) => PodcastsCubit(client.value), child: graphqlApp);
+  runApp(blocProvider);
 }
 
 class MyApp extends StatelessWidget {
@@ -22,7 +25,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade400)),
-      home: const PodcastList(),
+      home: PodcastList(),
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:podcast_player/bloc/podcast_cubit.dart';
 import 'package:podcast_player/graphql/graphql_docs.dart';
 import 'package:podcast_player/model/episode_model.dart';
 import 'package:podcast_player/model/podcast_model.dart';
@@ -23,8 +25,13 @@ class _ItemTileState extends State<ItemTile> {
     final client = GraphQLProvider.of(context).value;
 
     final isEpisodePage = widget.item is EpisodeModel;
-
     final isPlayed = isEpisodePage && (widget.item as EpisodeModel).isPlayed;
+    void refreshCubit() {
+      if (context.mounted) {
+        context.read<PodcastsCubit>().refresh();
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: DecoratedBox(
@@ -56,15 +63,23 @@ class _ItemTileState extends State<ItemTile> {
                         if (isEpisodePage) {
                           await client.mutate(MutationOptions(document: gql(removeEpisode), variables: {'episodeId': widget.item.id}));
                         } else {
+                          final podcast = widget.item as PodcastModel;
+                          final deleteNotAllowed = podcast.preventDelete;
+                          if (deleteNotAllowed) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleting ${podcast.title} podcast not allowed!')));
+                            return;
+                          }
                           await client.mutate(MutationOptions(document: gql(removePodcast), variables: {'podcastId': widget.item.id}));
                         }
+                        refreshCubit();
                       },
                       child: Icon(Icons.delete_forever_rounded, color: Colors.red),
                     ),
                     if (isEpisodePage && !isPlayed)
                       InkWell(
-                        onTap: () {
-                          client.mutate(MutationOptions(document: gql(markEpisodePlayed), variables: {'episodId': widget.item.id}));
+                        onTap: () async {
+                          await client.mutate(MutationOptions(document: gql(markEpisodePlayed), variables: {'episodId': widget.item.id}));
+                          refreshCubit();
                         },
                         child: Icon(Icons.check, color: Colors.blue),
                       ),

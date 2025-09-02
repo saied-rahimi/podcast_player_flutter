@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:podcast_player/graphql/graphql_docs.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast_player/bloc/podcast_cubit.dart';
 import 'package:podcast_player/model/podcast_model.dart';
 import 'package:podcast_player/widgets/text_widget.dart';
 
-import 'episodeList.dart';
+import 'episode_list.dart';
 import 'item_list_view.dart';
 
 class PodcastList extends StatelessWidget {
@@ -13,34 +13,35 @@ class PodcastList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = 'Podcast List';
+
     return Material(
-      child: Query(
-        options: QueryOptions(document: gql(queryAllPodcasts)),
-        builder: (QueryResult result, {VoidCallback? refetch, FetchMore? fetchMore}) {
-          if (result.hasException) {
-            return Center(child: Text(result.exception.toString()));
+      child: BlocBuilder<PodcastsCubit, PodcastsState>(
+        builder: (context, state) {
+          if (state is PodcastsHasError) {
+            return Center(child: Text(state.message));
           }
-
-          if (result.isLoading) {
-            return Center(child: const Text('Loading'));
-          }
-
-          final queryResult = result.data!['getPodcasts'] as List<dynamic>;
-          final podcastList = queryResult.map((item) => PodcastModel.fromJson(item)).toList();
-          return Scaffold(
-            appBar: podcastList.isEmpty ? AppBar(title: TitleText(title)) : null,
-
-            body: Center(
-              child: ItemListView(
-                podcastList,
-                title: title,
-                onTap: (index) {
-                  final episodeData = podcastList[index].episodsList;
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => EpisodeList(episodeData, podcastList[index].id)));
+          if (state is PodcastsChanged) {
+            final podcastList = state.podcastList as List<PodcastModel>;
+            return Scaffold(
+              appBar: podcastList.isEmpty ? AppBar(title: TitleText(title)) : null,
+              floatingActionButton: IconButton(
+                icon: Icon(Icons.restart_alt_rounded),
+                onPressed: () {
+                  context.read<PodcastsCubit>().refresh();
                 },
               ),
-            ),
-          );
+              body: Center(
+                child: ItemListView(
+                  podcastList,
+                  title: title,
+                  onTap: (index) {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => EpisodeList(podcastList[index].id!)));
+                  },
+                ),
+              ),
+            );
+          }
+          return Center(child: CircularProgressIndicator());
         },
       ),
     );
