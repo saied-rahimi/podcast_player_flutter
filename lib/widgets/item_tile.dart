@@ -78,7 +78,7 @@ class _ItemTileState extends State<ItemTile> {
                     if (isEpisodePage && !isPlayed)
                       InkWell(
                         onTap: () async {
-                          await client.mutate(MutationOptions(document: gql(markEpisodePlayed), variables: {'episodId': widget.item.id}));
+                          await client.mutate(MutationOptions(document: gql(markEpisodePlayed), variables: {'episodeId': widget.item.id}));
                           refreshCubit();
                         },
                         child: Icon(Icons.check, color: Colors.blue),

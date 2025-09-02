@@ -43,6 +43,7 @@ class ItemListView extends StatelessWidget {
                       showDialog(
                         context: context,
                         builder: (_) => AddItemDialog(
+                          pageName: podcastId != null ? 'Episode' : 'Podcast',
                           onCreate: (title) async {
                             if (podcastId != null) {
                               await client.mutate(MutationOptions(document: gql(createItem), variables: {'podcastId': podcastId, 'title': title}));

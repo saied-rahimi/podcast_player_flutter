@@ -19,7 +19,7 @@ class PodcastsCubit extends Cubit<PodcastsState> {
     if (query.data != null) {
       final queryResult = query.data!['getPodcasts'] as List<dynamic>;
       final podcastList = queryResult.map((item) {
-        final episodeList = item['episodsList'] as List<dynamic>;
+        final episodeList = item['episodeList'] as List<dynamic>;
         return PodcastModel.fromJson(item, episodeList.isNotEmpty);
       }).toList();
       emit(PodcastsChanged(podcastList: podcastList));

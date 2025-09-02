@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:podcast_player/widgets/text_widget.dart';
 
 class AddItemDialog extends StatefulWidget {
-  const AddItemDialog({this.onCreate, super.key});
+  const AddItemDialog({this.onCreate, this.pageName = 'Podcast', super.key});
   final void Function(String title)? onCreate;
-
+  final String pageName;
   @override
   State<AddItemDialog> createState() => _AddItemDialogState();
 }
@@ -26,7 +26,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
           mainAxisSize: MainAxisSize.min,
           spacing: 25,
           children: [
-            TitleText('Add Episode'),
+            TitleText('Create new ${widget.pageName}'),
             Container(
               width: 300,
               padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
@@ -40,7 +40,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
                 style: TextStyle(color: Colors.blue.shade400),
 
                 decoration: InputDecoration(
-                  hint: Text('Episode title'),
+                  hint: Text('${widget.pageName} title'),
 
                   alignLabelWithHint: true,
                   border: InputBorder.none,

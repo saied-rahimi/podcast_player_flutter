@@ -10,29 +10,29 @@ abstract class BaseModel extends Equatable {
 }
 
 class PodcastModel extends BaseModel {
-  const PodcastModel({super.id, required super.title, this.episodsList = const [], this.preventDelete = false});
+  const PodcastModel({super.id, required super.title, this.episodeList = const [], this.preventDelete = false});
 
-  final List<EpisodeModel> episodsList;
+  final List<EpisodeModel> episodeList;
   final bool preventDelete;
 
   factory PodcastModel.fromJson(Map<String, dynamic> json, bool preventDelete) {
     return PodcastModel(
       id: json['id'] as int,
       title: json['title'] as String,
-      episodsList: (json['episodsList'] as List<dynamic>).map((e) => EpisodeModel.fromJson(e as Map<String, dynamic>)).toList(),
+      episodeList: (json['episodeList'] as List<dynamic>).map((e) => EpisodeModel.fromJson(e as Map<String, dynamic>)).toList(),
       preventDelete: preventDelete,
     );
   }
 
-  PodcastModel copyWith({int? id, String? title, List<EpisodeModel>? episodsList, bool? preventDelete}) {
+  PodcastModel copyWith({int? id, String? title, List<EpisodeModel>? episodeList, bool? preventDelete}) {
     return PodcastModel(
       id: id ?? this.id,
       title: title ?? this.title,
-      episodsList: episodsList ?? this.episodsList,
+      episodeList: episodeList ?? this.episodeList,
       preventDelete: preventDelete ?? this.preventDelete,
     );
   }
 
   @override
-  List<Object?> get props => [id, title, episodsList, preventDelete];
+  List<Object?> get props => [id, title, episodeList, preventDelete];
 }

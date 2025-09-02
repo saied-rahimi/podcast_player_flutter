@@ -23,7 +23,7 @@ class EpisodeList extends StatelessWidget {
           builder: (context, state) {
             if (state is PodcastsChanged) {
               final podcast = state.podcastList.firstWhere((p) => p.id == podcastId) as PodcastModel;
-              final episodeData = podcast.episodsList;
+              final episodeData = podcast.episodeList;
 
               return Center(
                 child: ItemListView(episodeData, title: title, podcastId: podcastId),

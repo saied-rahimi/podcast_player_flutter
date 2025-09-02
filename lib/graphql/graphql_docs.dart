@@ -3,7 +3,7 @@ query {
 getPodcasts{
   id
   title
-  episodsList{
+  episodeList{
     id
     title
     isPlayed
@@ -33,7 +33,7 @@ mutation RemovePodcast($podcastId: Int!) {
 
 const String createEpisode = r"""
 mutation CreateEpisode($podcastId: Int!, $title: String!) {
-  createEpisod(podcastId: $podcastId, title: $title) {
+  createEpisode(podcastId: $podcastId, title: $title) {
     id
     title
     podcastId
@@ -52,8 +52,8 @@ mutation RemoveEpisode($episodeId: Int!) {
 """;
 
 const String markEpisodePlayed = r"""
-mutation MarkEpisodePlayed($episodId: Int!) {
-  markEpisodPlayed(episodId: $episodId) {
+mutation MarkEpisodePlayed($episodeId: Int!) {
+  markEpisodePlayed(episodeId: $episodeId) {
     id
     title
     isPlayed
